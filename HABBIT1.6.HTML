@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TRACK 2026</title>
+    <style>
+        :root {
+            --bg-deep: #050505;
+            --bg-panel: #0d0d0d;
+            --bg-card: #121212;
+            --neon-green: #00ffcc;
+            --neon-green-glow: rgba(0, 255, 204, 0.4);
+            --cyber-blue: #0088ff;
+            --cyber-blue-glow: rgba(0, 136, 255, 0.3);
+            --text-main: #e0e5ec;
+            --text-muted: #555555;
+            --border-dark: #222222;
+            --prof-silver: #e0e5ec;
+            --danger-red: #ff3333;
+            --priority-low: #00ffcc;
+            --priority-med: #0088ff;
+            --priority-high: #ffaa00;
+            --priority-max: #ff3333;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            background-image: 
+                linear-gradient(45deg, #080808 25%, transparent 25%, transparent 75%, #080808 75%, #080808), 
+                linear-gradient(45deg, #080808 25%, transparent 25%, transparent 75%, #080808 75%, #080808);
+            background-size: 20px 20px;
+            background-position: 0 0, 10px 10px;
+            color: var(--text-main);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            text-transform: uppercase;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        /* --- LAYOUT STRUCTURE --- */
+        .system-container {
+            max-width: 1600px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 25px;
+        }
+
+        /* --- SIDEBAR TELEMETRY --- */
+        .sidebar {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-dark);
+            border-top: 4px solid var(--cyber-blue);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            height: calc(100vh - 40px);
+            position: sticky;
+            top: 20px;
+        }
+
+        .system-title {
+            font-size: 1.2rem;
+            font-weight: 900;
+            letter-spacing: 2px;
+            color: var(--prof-silver);
+            text-shadow: 0 0 10px var(--cyber-blue-glow);
+            border-bottom: 2px solid var(--border-dark);
+            padding-bottom: 10px;
+            text-align: center;
+        }
+
+        .nav-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .nav-btn {
+            background: #000;
+            border: 1px solid var(--border-dark);
+            color: var(--text-main);
+            padding: 12px;
+            font-family: inherit;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s ease;
+            letter-spacing: 1px;
+            font-size: 0.85rem;
+        }
+
+        .nav-btn:hover, .nav-btn.active {
+            border-color: var(--neon-green);
+            color: var(--neon-green);
+            box-shadow: 0 0 10px var(--neon-green-glow);
+            transform: translateX(5px);
+        }
+
+        /* --- PROFILE MODULE --- */
+        .profile-module {
+            background: #000;
+            border: 1px solid var(--border-dark);
+            padding: 15px;
+            font-size: 0.8rem;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .stat-val {
+            color: var(--neon-green);
+            font-weight: bold;
+        }
+
+        /* --- MAIN VIEWPORTS --- */
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .viewport {
+            display: none;
+        }
+
+        .viewport.active {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        /* --- DASHBOARD VIEW --- */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 15px;
+        }
+
+        .telemetry-card {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-dark);
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .telemetry-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 4px; height: 100%;
+            background: var(--cyber-blue);
+        }
+
+        .telemetry-card.success::before { background: var(--neon-green);
+        }
+
+        .card-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+
+        .card-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--prof-silver);
+        }
+
+        /* --- MISSION CONTROL HUB --- */
+        .mission-panel {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-dark);
+            padding: 25px;
+        }
+
+        .panel-header {
+            font-size: 1.2rem;
+            color: var(--cyber-blue);
+            margin-bottom: 20px;
+            letter-spacing: 2px;
+            border-bottom: 1px dashed var(--border-dark);
+            padding-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .task-engine-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .input-panel {
+            background: #000;
+            border: 1px solid var(--border-dark);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        label {
+            font-size: 0.75rem;
+            color: var(--prof-silver);
+        }
+
+        input, select, textarea {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-dark);
+            color: var(--neon-green);
+            padding: 10px;
+            font-family: inherit;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--cyber-blue);
+        }
+
+        .sys-btn {
+            background: var(--border-dark);
+            border: 1px solid var(--border-dark);
+            color: var(--text-main);
+            padding: 12px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+
+        .sys-btn:hover {
+            background: var(--neon-green);
+            color: #000;
+            box-shadow: 0 0 15px var(--neon-green-glow);
+        }
+
+        /* --- TASK QUEUE VIEW --- */
+        .task-queue {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .task-card {
+            background: #000;
+            border: 1px solid var(--border-dark);
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            transition: border-color 0.2s;
+        }
+
+        .task-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-grow: 1;
+        }
+
+        .task-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .task-title {
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        .task-title.completed {
+            text-decoration: line-through;
+            color: var(--text-muted);
+        }
+
+        .tag {
+            font-size: 0.65rem;
+            padding: 2px 6px;
+            border: 1px solid var(--border-dark);
+            display: inline-block;
+            width: max-content;
+        }
+
+        /* Custom Checkbox */
+        .cyber-check {
+            display: none;
+        }
+
+        .cyber-check-label {
+            width: 20px;
+            height: 20px;
+            border: 1px solid var(--border-dark);
+            background: var(--bg-panel);
+            cursor: pointer;
+            display: block;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .cyber-check:checked + .cyber-check-label {
+            background: var(--neon-green);
+            border-color: var(--neon-green);
+            box-shadow: 0 0 10px var(--neon-green-glow);
+        }
+
+        .action-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 1.1rem;
+        }
+
+        .action-btn:hover { color: var(--danger-red);
+        }
+
+        /* --- MATRIX ENGINE CALENDAR --- */
+        .calendar-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .matrix-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+        }
+
+        .matrix-header {
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--cyber-blue);
+            font-weight: bold;
+            padding-bottom: 8px;
+            border-bottom: 1px dashed var(--border-dark);
+        }
+
+        .matrix-cell {
+            background: #000;
+            border: 1px solid var(--border-dark);
+            min-height: 90px;
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .matrix-cell:hover {
+            border-color: var(--prof-silver);
+        }
+
+        .matrix-cell.today {
+            border-color: var(--neon-green);
+            box-shadow: inset 0 0 10px rgba(0, 255, 204, 0.1);
+        }
+
+        .matrix-cell.empty {
+            background: transparent;
+            border: none;
+            cursor: default;
+        }
+
+        .cell-num {
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: var(--text-muted);
+        }
+
+        .matrix-cell.today .cell-num { color: var(--neon-green);
+        }
+
+        .cell-indicators {
+            display: flex;
+            gap: 3px;
+            flex-wrap: wrap;
+        }
+
+        .dot {
+            width: 6px;
+            height: 6px;
+            background: var(--cyber-blue);
+            border-radius: 50%;
+        }
+
+        .dot.done { background: var(--neon-green);
+        }
+
+        /* --- EXPERIENCE TUNING BAR --- */
+        .xp-container {
+            margin-top: auto;
+            background: #000;
+            border: 1px solid var(--border-dark);
+            padding: 12px;
+        }
+
+        .xp-label-group {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.7rem;
+            margin-bottom: 6px;
+            letter-spacing: 1px;
+        }
+
+        .xp-bar {
+            width: 100%;
+            height: 6px;
+            background: #111;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid #222;
+        }
+
+        .xp-fill {
+            height: 100%;
+            background: var(--neon-green);
+            width: 0%;
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 8px var(--neon-green-glow);
+        }
+
+        /* --- RESPONSIVE LAYOUT --- */
+        @media (max-width: 1100px) {
+            .system-container { grid-template-columns: 1fr;
+            }
+            .sidebar { height: auto; position: static;
+            }
+            .task-engine-layout { grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="system-container">
+        
+        <aside class="sidebar">
+            <div class="system-title">> SYSTEM CORE 2026</div>
+            
+            <div class="profile-module">
+                <div class="stat-row"><span></span><span class="stat-val"><b>Hey User</b></span></div>
+      
+                <div class="stat-row"><span>Current Level</span><span class="stat-val" id="profile-level">1</span></div>
+                <div class="stat-row"><span>Total Points:</span><span class="stat-val" id="profile-coins">0 C</span></div>
+                <div class="stat-row"><span>Current Streak:</span><span class="stat-val" id="profile-streak">0 DAYS</span></div>
+                <div class="stat-row"><span>Maximum Streak:</span><span class="stat-val" id="profile-max-streak">0 DAYS</span></div>
+            </div>
+
+           
+            <nav class="nav-menu">
+                <button class="nav-btn active" onclick="switchView('dashboard')">DASHBOARD</button>
+                <button class="nav-btn" onclick="switchView('tasks')">ADD TASKS</button>
+                <button class="nav-btn" onclick="switchView('calendar')">CALANDER</button>
+                <button class="nav-btn" onclick="switchView('history')">HISTORY</button>
+            </nav>
+
+            <div class="xp-container">
+                <div class="xp-label-group">
+                    <span>TOTAL XP</span>
+                    <span id="xp-text">0 / 300</span>
+                </div>
+                <div class="xp-bar">
+                    <div class="xp-fill" id="xp-fill-bar"></div>
+                </div>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            
+            <section id="viewport-dashboard" class="viewport active">
+                <div class="dashboard-grid">
+            
+                    <div class="telemetry-card">
+                        <div class="card-label">2026 COMPLITION</div>
+                        <div class="card-value" id="dash-year-progress">0.00%</div>
+                    </div>
+                   
+                    <div class="telemetry-card success">
+                        <div class="card-label">DAYS LEFT TO 2026</div>
+                        <div class="card-value" id="dash-year-countdown">365</div>
+                    </div>
+                    <div class="telemetry-card">
+  
+                        <div class="card-label">DAILY PERFORMANCE SCORE</div>
+                        <div class="card-value" id="dash-efficiency">0%</div>
+                    </div>
+                    <div class="telemetry-card success">
+       
+                        <div class="card-label">TOTAL XP GAINED TODAY</div>
+                        <div class="card-value" id="dash-total-xp">0 XP</div>
+                    </div>
+                </div>
+
+                
+                <div class="mission-panel">
+                    <div class="panel-header">
+                        <span>> TODAY'S TASK</span>
+                        <span id="dash-date-string" style="font-size: 0.8rem; color: var(--text-muted)"></span>
+                    </div>
+                    <div class="task-queue" id="dashboard-task-queue">
+                        </div>
+                </div>
+            </section>
+
+     
+            <section id="viewport-tasks" class="viewport">
+                <div class="mission-panel">
+                    <div class="panel-header">> ADD TASK</div>
+                    <div class="task-engine-layout">
+                        <div class="input-panel">
+     
+                            <div class="form-group">
+                                <label>WHAT'S THE GOAL</label>
+                                <input type="text" id="task-text" placeholder="SECURE OBJECTIVE...">
+                            </div>
+                            <div class="form-group">
+                                <label>FIX THE DEADLINE</label>
+                                <input type="date" id="task-date" value="2026-07-05">
+                            </div>
+                            <div class="form-group">
+                       
+                                <label>RATE THE TASK </label>
+                                <select id="task-priority">
+                                    <option value="10">EASY</option>
+                                    <option value="25" selected>MEDIUM</option>
+                                    <option value="50">HARD</option>
+                                    <option value="100">CRITICAL</option>
+                                </select>
+                            </div>
+                            <button class="sys-btn" onclick="taskController.addTask()">ADD TASK</button>
+                        </div>
+                        <div class="task-queue" id="manager-task-queue">
+                            </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="viewport-calendar" class="viewport">
+                <div class="mission-panel">
+                    <div class="calendar-controls">
+                        <button class="sys-btn" onclick="calendarEngine.prevMonth()">&lt;&lt; BACKWARD</button>
+                        <h2 id="calendar-month-year" style="letter-spacing: 3px;">JULY 2026</h2>
+                        <button class="sys-btn" onclick="calendarEngine.nextMonth()">FORWARD &gt;&gt;</button>
+                    </div>
+                    <div class="matrix-grid" id="matrix-calendar-grid">
+                        </div>
+                </div>
+            </section>
+
+            <section id="viewport-history" class="viewport">
+                <div class="mission-panel">
+                    <div class="panel-header">> SYSTEM HISTORY LOG</div>
+                    <div class="task-queue" id="history-task-queue" style="max-height: 600px;">
+                        </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script>
+        // --- DATA PERSISTENCE ENGINE ---
+        const systemState = {
+           
+            storageKey: 'HABIT_OS_CORE_DATA_2026',
+            data: {
+                tasks: {}, // Structured precisely: {'YYYY-MM-DD': [{id, text, done, priority}]}
+                profile: { xp: 0, level: 1, coins: 0, streak: 0, maxStreak: 0, lastActiveDate: '' },
+                historyLog: {} // Map tracking: {'YYYY-MM-DD': completedCount}
+        
+            },
+
+            init() {
+                const stored = localStorage.getItem(this.storageKey);
+                if (stored) {
+                    try {
+                        this.data = JSON.parse(stored);
+                    } catch(e) {
+                        console.error("DATA LOG INITIALIZATION FAULT. DEFAULT SETTINGS OVERRIDE RESUMED.", e);
+                    }
+                }
+                this.verifyStructure();
+                this.evaluateStreak();
+            },
+
+            verifyStructure() {
+                if (!this.data.tasks) this.data.tasks = {};
+                if (!this.data.profile) this.data.profile = { xp: 0, level: 1, coins: 0, streak: 0, maxStreak: 0, lastActiveDate: '' };
+                if (!this.data.historyLog) this.data.historyLog = {};
+            },
+
+            save() {
+                localStorage.setItem(this.storageKey, JSON.stringify(this.data));
+                uiCore.renderAll();
+            },
+
+            evaluateStreak() {
+                const todayStr = uiCore.getTimestampString(new Date());
+                const yesterday = new Date();
+                yesterday.setDate(yesterday.getDate() - 1);
+                const yesterdayStr = uiCore.getTimestampString(yesterday);
+
+                if (this.data.profile.lastActiveDate === todayStr) return;
+                if (this.data.profile.lastActiveDate !== yesterdayStr && this.data.profile.lastActiveDate !== '') {
+                    this.data.profile.streak = 0;
+                }
+            }
+        };
+        // --- TASK CORE MANAGER CONTROLLER ---
+        const taskController = {
+            addTask() {
+                const dateEl = document.getElementById('task-date');
+                const textEl = document.getElementById('task-text');
+                const prioEl = document.getElementById('task-priority');
+
+                const dateStr = dateEl.value;
+                const text = textEl.value.trim();
+                const xpValue = parseInt(prioEl.value);
+                if(!dateStr || !text) return;
+
+                if(!systemState.data.tasks[dateStr]) {
+                    systemState.data.tasks[dateStr] = [];
+                }
+
+                systemState.data.tasks[dateStr].push({
+                    id: Date.now().toString() + Math.floor(Math.random() * 1000),
+                    text: text,
+                    done: false,
+                 
+                    priority: xpValue
+                });
+                textEl.value = '';
+                systemState.save();
+            },
+
+            toggleTask(dateStr, taskId) {
+                const dayTasks = systemState.data.tasks[dateStr] || [];
+                const task = dayTasks.find(t => t.id === taskId);
+                if(task) {
+                    task.done = !task.done;
+                    if(task.done) {
+                        systemState.data.profile.xp += task.priority;
+                        systemState.data.profile.coins += Math.round(task.priority * 0.2);
+                        this.processCheckInStreak(dateStr);
+                    } else {
+                        systemState.data.profile.xp = Math.max(0, systemState.data.profile.xp - task.priority);
+                        systemState.data.profile.coins = Math.max(0, systemState.data.profile.coins - Math.round(task.priority * 0.2));
+                    }
+
+                    this.evaluateLeveling();
+                    this.updateHistoryLog(dateStr);
+                    systemState.save();
+                }
+            },
+
+            deleteTask(dateStr, taskId) {
+                if(!systemState.data.tasks[dateStr]) return;
+                const taskIndex = systemState.data.tasks[dateStr].findIndex(t => t.id === taskId);
+                if (taskIndex > -1) {
+                    const task = systemState.data.tasks[dateStr][taskIndex];
+                    if(task.done) {
+                        systemState.data.profile.xp = Math.max(0, systemState.data.profile.xp - task.priority);
+                        systemState.data.profile.coins = Math.max(0, systemState.data.profile.coins - Math.round(task.priority * 0.2));
+                        this.evaluateLeveling();
+                    }
+                    systemState.data.tasks[dateStr].splice(taskIndex, 1);
+                    if(systemState.data.tasks[dateStr].length === 0) delete systemState.data.tasks[dateStr];
+                    
+                    this.updateHistoryLog(dateStr);
+                    systemState.save();
+                }
+            },
+
+            processCheckInStreak(dateStr) {
+                const todayStr = uiCore.getTimestampString(new Date());
+                if(dateStr === todayStr && systemState.data.profile.lastActiveDate !== todayStr) {
+                    systemState.data.profile.streak += 1;
+                    if(systemState.data.profile.streak > systemState.data.profile.maxStreak) {
+                        systemState.data.profile.maxStreak = systemState.data.profile.streak;
+                    }
+                    systemState.data.profile.lastActiveDate = todayStr;
+                }
+            },
+
+            evaluateLeveling() {
+                let currentLevelThreshold = systemState.data.profile.level * 300;
+                while (systemState.data.profile.xp >= currentLevelThreshold) {
+                    systemState.data.profile.xp -= currentLevelThreshold;
+                    systemState.data.profile.level += 1;
+                    currentLevelThreshold = systemState.data.profile.level * 300;
+                }
+            },
+
+            updateHistoryLog(dateStr) {
+                const dayTasks = systemState.data.tasks[dateStr] || [];
+                const completedCount = dayTasks.filter(t => t.done).length;
+                if(completedCount > 0) {
+                    systemState.data.historyLog[dateStr] = completedCount;
+                } else {
+                    delete systemState.data.historyLog[dateStr];
+                }
+            }
+        };
+        // --- CALENDAR ENGINE / MATRIX VISUALIZER ---
+        const calendarEngine = {
+            currentDisplayDate: new Date(2026, 6, 1), 
+
+            nextMonth() {
+                this.currentDisplayDate.setMonth(this.currentDisplayDate.getMonth() + 1);
+                uiCore.renderCalendar();
+            },
+
+            prevMonth() {
+                this.currentDisplayDate.setMonth(this.currentDisplayDate.getMonth() - 1);
+                uiCore.renderCalendar();
+            }
+        };
+        // --- USER INTERFACE AND RUNTIME VIEW CONTROLLER ---
+        const uiCore = {
+            monthsLabels: ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"],
+            daysLabels: ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"],
+
+            getTimestampString(dateObj) {
+                const y = dateObj.getFullYear();
+                const m = String(dateObj.getMonth() + 1).padStart(2, '0');
+                const d = String(dateObj.getDate()).padStart(2, '0');
+                return `${y}-${m}-${d}`;
+            },
+
+            renderAll() {
+                this.renderProfile();
+                this.renderDashboard();
+                this.renderTaskManager();
+                this.renderCalendar();
+                this.renderHistory(); // ADDED HISTORY RENDER CALL
+            },
+
+            renderProfile() {
+                document.getElementById('profile-level').innerText = systemState.data.profile.level;
+                document.getElementById('profile-coins').innerText = `${systemState.data.profile.coins} C`;
+                document.getElementById('profile-streak').innerText = `${systemState.data.profile.streak} DAYS`;
+                document.getElementById('profile-max-streak').innerText = `${systemState.data.profile.maxStreak} DAYS`;
+
+                const reqXp = systemState.data.profile.level * 300;
+                const currXp = systemState.data.profile.xp;
+                document.getElementById('xp-text').innerText = `${currXp} / ${reqXp} XP`;
+                document.getElementById('xp-fill-bar').style.width = `${(currXp / reqXp) * 100}%`;
+            },
+
+            renderDashboard() {
+                const now = new Date();
+                const start = new Date(2026, 0, 1);
+                const end = new Date(2026, 11, 31);
+                const totalYearDays = Math.round((end - start) / (1000 * 60 * 60 * 24)) + 1;
+                const currentElapsedDays = Math.round((now - start) / (1000 * 60 * 60 * 24));
+                let pctCompleted = ((currentElapsedDays / totalYearDays) * 100);
+                if(pctCompleted < 0) pctCompleted = 0;
+                if(pctCompleted > 100) pctCompleted = 100;
+                document.getElementById('dash-year-progress').innerText = `${pctCompleted.toFixed(2)}%`;
+                
+                const daysRemaining = Math.max(0, totalYearDays - currentElapsedDays);
+                document.getElementById('dash-year-countdown').innerText = daysRemaining;
+
+                const todayStr = this.getTimestampString(now);
+                document.getElementById('dash-date-string').innerText = `// DATE DIRECTIVE MARK: ${todayStr}`;
+
+                const todayTasks = systemState.data.tasks[todayStr] || [];
+                const doneCount = todayTasks.filter(t => t.done).length;
+                const dailyScore = todayTasks.length === 0 ? 0 : Math.round((doneCount / todayTasks.length) * 100);
+                
+                document.getElementById('dash-efficiency').innerText = `${dailyScore}%`;
+                let cumulativeXpCalculated = 0;
+                Object.values(systemState.data.tasks).forEach(dayArr => {
+                    dayArr.forEach(t => { if(t.done) cumulativeXpCalculated += t.priority; });
+                });
+                document.getElementById('dash-total-xp').innerText = `${cumulativeXpCalculated} XP`;
+
+                this.populateTaskContainer(todayTasks, todayStr, 'dashboard-task-queue');
+            },
+
+            renderTaskManager() {
+                const targetDate = document.getElementById('task-date').value;
+                const selectedDateTasks = systemState.data.tasks[targetDate] || [];
+                this.populateTaskContainer(selectedDateTasks, targetDate, 'manager-task-queue');
+            },
+
+            populateTaskContainer(tasksArray, dateStr, containerId) {
+                const container = document.getElementById(containerId);
+                if(tasksArray.length === 0) {
+                    container.innerHTML = `<div style="font-size:0.75rem; color:var(--text-muted); padding:10px;">NO CONFIGURED DIRECTIVES ON FILE FOR THIS DATA-NODE.</div>`;
+                    return;
+                }
+
+                container.innerHTML = tasksArray.map(task => `
+                    <div class="task-card">
+                        <div class="task-left">
+                            <input type="checkbox" id="chk-${task.id}" class="cyber-check" ${task.done 
+ ? 'checked' : ''} onchange="taskController.toggleTask('${dateStr}', '${task.id}')">
+                            <label for="chk-${task.id}" class="cyber-check-label"></label>
+                            <div class="task-meta">
+                                <span class="task-title ${task.done ? 
+ 'completed' : ''}">${task.text}</span>
+                                <span class="tag" style="color:${this.getPrioColor(task.priority)}; border-color:${this.getPrioColor(task.priority)}">${task.priority} XP</span>
+                            </div>
+                        </div>
+          
+                        <div class="action-actions">
+                            <button class="action-btn" onclick="taskController.deleteTask('${dateStr}', '${task.id}')">×</button>
+                        </div>
+                    </div>
+          
+                `).join('');
+            },
+
+            getPrioColor(prioValue) {
+                if(prioValue <= 10) return 'var(--priority-low)';
+                if(prioValue <= 25) return 'var(--priority-med)';
+                if(prioValue <= 50) return 'var(--priority-high)';
+                return 'var(--priority-max)';
+            },
+
+            renderCalendar() {
+                const viewDate = calendarEngine.currentDisplayDate;
+                const year = viewDate.getFullYear();
+                const month = viewDate.getMonth();
+
+                document.getElementById('calendar-month-year').innerText = `${this.monthsLabels[month]} ${year}`;
+
+                const firstDayIndex = new Date(year, month, 1).getDay();
+                const normalizedStartOffset = firstDayIndex === 0 ? 6 : firstDayIndex - 1;
+                const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+                const gridContainer = document.getElementById('matrix-calendar-grid');
+                gridContainer.innerHTML = '';
+                this.daysLabels.forEach(dName => {
+                    gridContainer.innerHTML += `<div class="matrix-header">${dName}</div>`;
+                });
+                for(let i = 0; i < normalizedStartOffset; i++) {
+                    gridContainer.innerHTML += `<div class="matrix-cell empty"></div>`;
+                }
+
+                const todayStamp = this.getTimestampString(new Date());
+                for(let day = 1; day <= daysInMonth; day++) {
+                    const loopDate = new Date(year, month, day);
+                    const loopDateStr = this.getTimestampString(loopDate);
+                    const isToday = loopDateStr === todayStamp;
+
+                    const dayTasks = systemState.data.tasks[loopDateStr] || [];
+                    let dotsHtml = dayTasks.map(t => `<div class="dot ${t.done ? 'done' : ''}"></div>`).join('');
+                    gridContainer.innerHTML += `
+                        <div class="matrix-cell ${isToday ? 'today' : ''}" onclick="uiCore.setTaskTargetDate('${loopDateStr}')">
+                            <span class="cell-num">${day}</span>
+                            <div class="cell-indicators">${dotsHtml}</div>
+         
+                        </div>
+                    `;
+                }
+            },
+
+            // --- NEW FUNCTION: RENDER HISTORY LOG ---
+            renderHistory() {
+                const container = document.getElementById('history-task-queue');
+                
+                // Grab all dates from the data state and sort them newest to oldest
+                const allDates = Object.keys(systemState.data.tasks).sort((a, b) => new Date(b) - new Date(a));
+
+                // If there is no history, show a system message
+                if(allDates.length === 0) {
+                    container.innerHTML = `<div style="font-size:0.75rem; color:var(--text-muted); padding:10px;">NO HISTORICAL DIRECTIVES ON FILE.</div>`;
+                    return;
+                }
+
+                let historyHtml = '';
+                
+                // Loop through each date in the history
+                allDates.forEach(dateStr => {
+                    const dayTasks = systemState.data.tasks[dateStr];
+                    
+                    if(dayTasks && dayTasks.length > 0) {
+                        // Add a date header for group styling
+                        historyHtml += `<div class="card-label" style="margin-top: 20px; color: var(--cyber-blue); font-weight: bold;">// LOG DATE: ${dateStr}</div>`;
+                        
+                        // Loop through tasks for that specific date
+                        dayTasks.forEach(task => {
+                            const statusColor = task.done ? 'var(--neon-green)' : 'var(--text-muted)';
+                            const statusText = task.done ? 'COMPLETED' : 'PENDING / FAILED';
+                            
+                            historyHtml += `
+                                <div class="task-card" style="border-left: 3px solid ${statusColor};">
+                                    <div class="task-left">
+                                        <div class="task-meta">
+                                            <span class="task-title ${task.done ? 'completed' : ''}">${task.text}</span>
+                                            <span class="tag" style="color:${this.getPrioColor(task.priority)}; border-color:${this.getPrioColor(task.priority)}">
+                                                ${task.priority} XP | ${statusText}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                        });
+                    }
+                });
+
+                // Inject the generated HTML into the history viewport
+                container.innerHTML = historyHtml;
+            },
+
+            setTaskTargetDate(dateStr) {
+                document.getElementById('task-date').value = dateStr;
+                switchView('tasks');
+                this.renderTaskManager();
+            }
+        };
+        // --- GLOBAL APPARATUS VIEW PORTS TOGGLE SWITCH ---
+        function switchView(viewportId) {
+            document.querySelectorAll('.viewport').forEach(view => view.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+
+            const targetViewport = document.getElementById(`viewport-${viewportId}`);
+            if(targetViewport) targetViewport.classList.add('active');
+            
+            const eventSourceButton = Array.from(document.querySelectorAll('.nav-btn')).find(b => b.getAttribute('onclick').includes(viewportId));
+            if(eventSourceButton) eventSourceButton.classList.add('active');
+        }
+
+        // --- CORE KERNEL BOOT RUNTIME PIPELINE ---
+        window.addEventListener('DOMContentLoaded', () => {
+            const localNowStr = uiCore.getTimestampString(new Date());
+            document.getElementById('task-date').value = localNowStr;
+
+            document.getElementById('task-date').addEventListener('change', () => {
+                uiCore.renderTaskManager();
+            });
+
+ 
+            systemState.init();
+            uiCore.renderAll();
+        });
+</script>
+</body>
+</html>  
